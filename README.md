@@ -1,7 +1,7 @@
 # Install
 1. `install.packages("devtools"")`
 2. `devtools::install_github("jlewis91/RGoogleAnalytics", ref = "patch-1")`
-2. `install.packages("~/Desktop/analyticsMerger_0.1.tar.gz", repos=NULL, type="source")`
+2. `devtools::install_github("jlewis91/reportingManager")`
 3. Obtain / create `config.json`
 ```
  {
