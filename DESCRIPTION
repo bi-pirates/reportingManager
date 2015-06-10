@@ -1,0 +1,18 @@
+Package: reportingManagr
+Type: Package
+Title: Merges Data from Different Analytics APIs
+Version: 0.1.1
+Date: 2015-06-05
+Authors@R: person("Jeremiah", "Lewis", email = "jeremiah.lewis@razorfish.de", role = c("aut", "cre"))
+Description: Merges Google Analytics, SiteCatalyst, etc. data into a consistent format
+License: MIT
+LazyData: TRUE
+Imports:
+    devtools,
+    httr,
+    httpuv,
+    reshape2,
+    RGoogleAnalytics,
+    jsonlite,
+    data.table
+
