@@ -4,7 +4,7 @@
 \alias{query_facebook}
 \title{Fetch clean, streamlined Facebook Insights Data, from a data.table of queries}
 \usage{
-query_facebook(query_facebook_single, queries_table, start_date, end_date,
+query_facebook(queries_table, start_date, end_date,
   config_path = "config.json", token_path = "tokens/fbInsights_token",
   override_dates = TRUE, include_query_data = FALSE)
 }

@@ -33,15 +33,12 @@ auth_fbInsights <- function(config_path = "config.json", token_path = "tokens/fb
   httr::stop_for_status(req)
 }
 
-#' Fetch clean, streamlined Facebook Insights Data, from a data.table of queries
-#' @export
 query_facebook_single <- function(query, start_date, end_date
-                              , config_path, token_path, override_dates = override_dates){
+                              , config_path, token_path, override_dates){
     load(token_path)
 
 
     url <- with(query, sprintf("https://graph.facebook.com/%s/insights/%s", Page, Metric))
-
 
     # Fill in missing dates & override date field if necessary
     if(is.null(query["start.date"]) | override_dates) {
@@ -50,16 +47,18 @@ query_facebook_single <- function(query, start_date, end_date
     if(is.null(query["end.date"]) | override_dates) {
       query["end.date"] <- end_date
     }
+    query["start.date"] <- as.character(max(lubridate::floor_date(as.Date(query$start.date) - lubridate::days(90), "month"), Sys.Date() - 90)) #Data only available 90 days back
 
-    query["start_date"] <- as.character(max(lubridate::floor_date(as.Date(query["start.date"]) - lubridate::days(90), "month"), Sys.Date() - 90)) #Data only available 90 days back
     req <- httr::GET(url, httr::config(token = facebook_token), query=list(since=query$start.date, until=query$end_date, period=query$period))
     httr::stop_for_status(req)
-    data <- httr::content(req)$data[[1]]$values
-    data_points <- rbindlist(lapply(data, function(x) as.list(c(end_time = unlist(x$end_time), unlist(x$value)))), fill=TRUE) #date conversion should be added here
+    data <- httr::content(req)$data[[1]]
+    data_points <- rbindlist(lapply(data$values, function(x) as.list(c(end_time = unlist(x$end_time), unlist(x$value)))), fill=TRUE) #date conversion should be added here
+    data_points[, metric := data$title]
     data_points <- data.table(data_points)
     data_points[,date := as.character(as.Date(end_time, format = "%Y-%m-%dT"))]
     data_points[,end_time := NULL]
-    data_points <- melt(data_points, id.var = "date", variable.name = "Metric2")
+    data_points <- reshape2::melt(data_points, id.var = c("date", "metric"), variable.name = "interactionType")
+    data_points[, query.data := jsonlite::toJSON(query)]
     return(data_points)
 }
 
@@ -69,11 +68,11 @@ query_generic <- function(query_function, queries_table, start_date, end_date, c
 
   for (i in 1:nrow(queries_table)) {
     results[[i]] <- query_function(as.list(queries_table[i,])
-                                    , start_date, end_date, config_path, token_path, override_dates = override_dates)
+                                    , start_date, end_date, config_path, token_path, override_dates)
   }
   results <- data.table::rbindlist(results, fill = TRUE)
   if(!include_query_data) {
-    results[, query := NULL]
+    results[, query.data := NULL]
   }
   return(results)
 }
@@ -97,6 +96,6 @@ query_generic <- function(query_function, queries_table, start_date, end_date, c
 #' query_facebook(queries_table, "2015-01-01", "2015-02-01", config_path = "config.json", override_dates = TRUE)
 #' }
 #' @export
-query_facebook <- function(query_facebook_single, queries_table, start_date, end_date, config_path = "config.json", token_path = "tokens/fbInsights_token", override_dates = TRUE, include_query_data = FALSE) {
-  query_generic(query_function, queries_table, start_date, end_date, config_path = "config.json", token_path = "tokens/fbInsights_token", override_dates = TRUE, include_query_data = FALSE)
+query_facebook <- function(queries_table, start_date, end_date, config_path = "config.json", token_path = "tokens/fbInsights_token", override_dates = TRUE, include_query_data = FALSE) {
+  query_generic(query_facebook_single, queries_table, start_date, end_date, config_path = "config.json", token_path = "tokens/fbInsights_token", override_dates = TRUE, include_query_data = FALSE)
 }
