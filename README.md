@@ -24,9 +24,12 @@ config_path <- "config.json" # Location of config.json file
 gdrive_auth(config_path) # Create google drive credential (will be saved to token/gdrive_token)
 
 queries <- get_gdrive_queries(config_path) # Get google drive queries (from folder specified in config)
-final_data <- query_ga(queries$`Blended Ice GA`, "2015-06-01", "2015-06-01", config_path) #Get data
+googleData <- query_ga(queries$GoogleAnalytics, "2015-06-01", "2015-06-01", config_path) #Get data
+
+facebookData <- query_facebook(queries$facebook_queries, "2015-06-05", "2015-06-08")
 ```
 
 # Query Template:
-- The following google doc can be copied and used to build a list of queries:
-https://docs.google.com/spreadsheets/d/14fsu5SEMDo74SxKdl7IS7BMU3QheINba2pJzkEAVRzE/edit?usp=sharing
+- The following google docs can be copied and used to build a list of queries:
+[Google Analytics](https://docs.google.com/spreadsheets/d/14fsu5SEMDo74SxKdl7IS7BMU3QheINba2pJzkEAVRzE/edit?usp=sharing)
+[Facebook]
