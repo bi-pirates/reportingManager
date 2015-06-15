@@ -42,7 +42,7 @@ if(!is.list(query)) {
 if(is.null(query["start.date"]) | override_dates) {
   query["start.date"] <- start_date
 }
-if(is.null(query["start.date"]) | override_dates) {
+if(is.null(query["end.date"]) | override_dates) {
   query["end.date"] <- end_date
 }
 # Remove NA / Irrelevant Fields
@@ -65,9 +65,9 @@ return(list(query = query, labels = labels))
 }
 
 
-#' Fetch clean, streamlined GoogleAnalytics Data, from a data.table of queries
+#' Fetch clean, streamlined Google Analytics Data, from a data.table of queries
 #'
-#' \code{query_ga} returns multiple GoogleAnalytics responses in a single data.table
+#' \code{query_ga} returns multiple Google Analytics API responses in a single data.table
 #'
 #'
 #' @param queries_table data.table of queries

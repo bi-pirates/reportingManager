@@ -14,5 +14,5 @@ Imports:
     reshape2,
     RGoogleAnalytics,
     jsonlite,
-    data.table
-
+    data.table,
+    lubridate
