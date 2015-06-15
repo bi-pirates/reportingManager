@@ -3,19 +3,20 @@ NULL
 
 #' Authorize Google Drive access
 #'
-#' \code{gdrive_auth} generates a token which is saved to \code{token/gdrive_token} and used for accessing a google drive folder
+#' \code{auth_gdrive} generates a token which is saved to \code{tokens/gdrive_token} and used for accessing a google drive folder
 #'
 #'
 #' @param config_path path where the config.json file is located
-#' @param create_token whether a new token should be created (mandatory, if an existing token is not available in the dir token/)
-#' @return A google drive token in the (newly created?) \code{token/gdrive_token} directory.
+#' @param token_path path to the token file
+#' @param create_token whether a new token should be created (mandatory, if an existing token is not available in the dir tokens/)
+#' @return A google drive token in the (newly created?) \code{tokens/gdrive_token} directory.
 #'
 #' @examples
 #' \dontrun{
-#' gdrive_auth("config.json", create_token=TRUE)
+#' auth_gdrive("config.json", create_token=TRUE)
 #' }
 #' @export
-gdrive_auth <- function(config_path = "config.json", create_token=TRUE){
+auth_gdrive <- function(config_path = "config.json", token_path = "tokens/gdrive_token", create_token=TRUE){
   if(create_token){
     config_data <- jsonlite::fromJSON(config_path)
     a <- readline(sprintf("Sign into %s@gmail.com google account, then hit <RETURN>."
@@ -25,9 +26,9 @@ gdrive_auth <- function(config_path = "config.json", create_token=TRUE){
     myapp <- with(config_data$google_drive, httr::oauth_app("gdrive", client_id, client_secret))
     gdrive_token <- httr::oauth2.0_token(httr::oauth_endpoints("google"), myapp, scope = scope)
     dir.create(path = "tokens", showWarnings = FALSE)
-    save(gdrive_token, file="tokens/gdrive_token")
+    save(gdrive_token, file = token_path)
   }
-  load("tokens/gdrive_token")
+  load(token_path)
   req <- httr::GET("https://www.googleapis.com/oauth2/v1/userinfo",
              httr::config(token = gdrive_token))
   httr::stop_for_status(req)
