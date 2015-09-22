@@ -1,5 +1,5 @@
 # Install
-1. `install.packages("devtools"")`
+1. `install.packages("devtools")`
 2. `devtools::install_github("jlewis91/RGoogleAnalytics", ref = "patch-1")`
 2. `devtools::install_github("RazorfishGermany/reportingManager")`
 3. Obtain / create `config.json`
