@@ -5,10 +5,10 @@
 
 # Sample Code:
 ```
-library(reportingManagr)
+library(reportingManager)
 createConfigTemplate() # Generate `config.json` file template.
 ## Edit this file with the correct parameters.
-gdrive_auth("config.json") # Create google drive credential (will be saved to token/gdrive_token)
+auth_gdrive("config.json") # Create google drive credential (will be saved to token/gdrive_token)
 
 queries <- get_gdrive_queries(config_path) # Get google drive queries (from folder specified in config)
 googleData <- query_ga(queries$GoogleAnalytics, "2015-06-01", "2015-06-01", config_path) #Get data

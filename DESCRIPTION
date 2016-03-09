@@ -4,7 +4,8 @@ Title: Merges Data from Different Analytics APIs
 Version: 0.1.2
 Date: 2015-06-15
 Authors@R: person("Jeremiah", "Lewis", email = "jeremiah.lewis@razorfish.de", role = c("aut", "cre"))
-Description: Merges Google Analytics, SiteCatalyst, etc. data into a consistent format
+Description: Merges Google Analytics, SiteCatalyst, etc. data into a consistent
+    format
 License: MIT
 LazyData: TRUE
 Imports:
@@ -16,3 +17,4 @@ Imports:
     jsonlite,
     data.table,
     lubridate
+RoxygenNote: 5.0.1
