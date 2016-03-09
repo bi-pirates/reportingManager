@@ -59,7 +59,8 @@ get_sheet <- function(link){
   load("tokens/gdrive_token")
   req <- httr::GET(link, httr::config(token = gdrive_token))
   httr::stop_for_status(req)
-  req <- data.table::data.table(httr::content(req))
+  req <- httr::content(req, encoding = "UTF-8", as = "text")
+  req <- data.table::fread(req)
   req[req == ""] <- NA
   return(req)
 }
@@ -80,6 +81,6 @@ get_gdrive_queries <- function(config_path){
   config_data <- jsonlite::fromJSON(config_path)
   files <- get_query_folder_contents(config_data$google_drive)
   links <- sapply(files, get_download_link, USE.NAMES=TRUE)
-  query_data <- sapply(links, get_sheet, USE.NAMES=TRUE)
+  query_data <- lapply(links, get_sheet)
   return(query_data)
 }
