@@ -120,7 +120,9 @@ melt_ga <- function(data, queryInfo){
 
 
 add_in_ga_date<- function(data) {
-  if(all(data$resolution == "year")){
+  if(all(data$resolution == "lifetime")){
+    data[, date := ""]
+  } else if (all(data$resolution == "year")){
     data[, date := as.Date(paste(year, "01-01", sep="-"), format="%Y-%m-%d")]
   } else if(all(data$resolution == "month")){
     data[, date := as.Date(paste(year, month, "01", sep="-"), format="%Y-%m-%d")]
@@ -131,6 +133,8 @@ add_in_ga_date<- function(data) {
   } else if(all(data$resolution == "hour")){
     data[, date := as.Date(paste(date, hour, sep="-"), format="%Y%m%d-%H")]
   }
-  data[, date := as.character(date)]
+
+    data[, date := as.character(date)]  
+  
   return(data)
 }
