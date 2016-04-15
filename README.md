@@ -14,6 +14,22 @@ queries <- get_gdrive_queries(config_path) # Get google drive queries (from fold
 googleData <- query_ga(queries$GoogleAnalytics, "2015-06-01", "2015-06-01", config_path) #Get data
 
 facebookData <- query_facebook(queries$facebook_queries, "2015-06-05", "2015-06-08")
+
+### Adobe Export ###
+
+# Get Adobe Queries
+scQueries <- fread("queries/SCqueries.tsv", sep = "\t")
+# Get Adobe Credentials
+cred <- fread()
+
+####################### Examples #############################################################
+# live <- fetchSC(scQueries, cred[Suite == "<NAME>"], "YYYY-MM-DD", "YYYY-MM-DD")
+##############################################################################################
+
+# GetMetrics(reportsuite.ids = "<ID>")
+# GetElements(reportsuite.ids = "<ID>")
+# GetSegments(reportsuite.ids = "<ID>")
+
 ```
 
 # Query Template:
