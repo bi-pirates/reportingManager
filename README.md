@@ -14,6 +14,7 @@ queries <- get_gdrive_queries(config_path) # Get google drive queries (from fold
 googleData <- query_ga(queries$GoogleAnalytics, "2015-06-01", "2015-06-01", config_path) #Get data
 
 facebookData <- query_facebook(queries$facebook_queries, "2015-06-05", "2015-06-08")
+
 ```
 
 # Query Template:
