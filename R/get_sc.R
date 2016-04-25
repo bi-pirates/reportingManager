@@ -1,7 +1,8 @@
 query_sc_single <- function(query, start_date, end_date, config_path, override_dates = TRUE) { 
  
-  metrics <- ifelse(is.na(query$metrics), "NA", strsplit(query$metrics, ",")[[1]])
-  elements <- ifelse(is.na(query$elements), "NA", strsplit(query$elements, ",")[[1]])
+  query$metrics <- ifelse(is.na(query$metrics), "NA", strsplit(query$metrics, ","))[[1]]
+  query$elements <- ifelse(is.na(query$elements), "NA", strsplit(query$elements, ","))[[1]]
+  query$search <- ifelse(is.na(query$search), FALSE, strsplit(query$search, ","))[[1]]
   
   if(override_dates){
     query$start_date <- start_date
@@ -18,16 +19,18 @@ query_sc_single <- function(query, start_date, end_date, config_path, override_d
   if(is.na(query$top)) {
     query$top <- 5000
   }
-  if(is.na(query$search)) {
-    query$search <- c()
+  
+  if(is.na(query$segment.id)) {
+    query$segment.id <- FALSE
   }
+  
   if(query$queryType == "overtime"){
     data <- with(query, RSiteCatalyst::QueueOvertime(suite, start_date, end_date
-                                         , metrics, date.granularity, segment.id = segment.id))
+                                         , metrics, date.granularity = date.granularity, segment.id = segment.id))
   } else if (query$queryType == "trended") {
     data <- with(query, RSiteCatalyst::QueueTrended(suite, start_date, end_date
                                         , metrics, elements, search = search, segment.id = segment.id
-                                        , date.granularity, top = top))
+                                        , date.granularity = date.granularity, top = top))
   } else if (query$queryType == "ranked") {
     data <- with(query, RSiteCatalyst::QueueRanked(suite, start_date, end_date
                                        , metrics, elements, search = search
@@ -38,11 +41,12 @@ query_sc_single <- function(query, start_date, end_date, config_path, override_d
     data$datetime <- as.Date(data$datetime)
   }
   
+  data <- data.table(data)
+  
   if("name" %in% colnames(data)){
-    setnames(data, "name", elements)
+    data <- data[,name := query$queryName]
   }
 
-  data <- data.table(data)
   return(data)
 }
 
