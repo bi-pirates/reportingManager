@@ -28,7 +28,7 @@ query_sc_single <- function(query, start_date, end_date, config_path, override_d
     data <- with(query, RSiteCatalyst::QueueTrended(suite, start_date, end_date
                                         , metrics, elements, search = search, segment.id = segment.id
                                         , date.granularity, top = top))
-  } else if (queryType == "ranked") {
+  } else if (query$queryType == "ranked") {
     data <- with(query, RSiteCatalyst::QueueRanked(suite, start_date, end_date
                                        , metrics, elements, search = search
                                        , segment.id = segment.id, top = top))
