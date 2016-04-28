@@ -44,8 +44,9 @@ query_sc_single <- function(query, start_date, end_date, config_path, override_d
   data <- data.table(data)
   
   if("name" %in% colnames(data)){
-    data <- data[,name := query$queryName]
+    setnames(data, "name", query$elements)
   }
+  data <- data[,name := query$queryName]
 
   return(data)
 }
@@ -69,6 +70,7 @@ query_sc <- function(queries_table, start_date, end_date, config_path = "config.
                                     override_dates = override_dates)
     Sys.sleep(1)
   }
+  
   results <- data.table::rbindlist(results, fill = TRUE)
   if(!include_query_data) {
     results[, query := NULL]
