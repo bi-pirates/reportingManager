@@ -1,10 +1,10 @@
 invalid <- function(x) { is.na(x) | is.null(x) | x == ""}
 
 query_sc_single <- function(query, start_date, end_date, config_path, override_dates = TRUE) { 
- 
-  metrics_clean <- ifelse(invalid(query$metrics), "NA", strsplit(query$metrics, ",")[[1]])
-  elements_clean <- ifelse(invalid(query$elements), "NA", strsplit(query$elements, ",")[[1]])
-  search_clean <- ifelse(invalid(query$search), c(), strsplit(query$search, ",")[[1]])
+
+ metrics_clean <- ifelse(invalid(query$metrics), "NA", strsplit(query$metrics, ","))[[1]]
+ elements_clean <- ifelse(invalid(query$elements), "NA", strsplit(query$elements, ","))[[1]]
+ search_clean <- ifelse(invalid(query$search), c(), strsplit(query$search, ","))[[1]]
 
   if(override_dates){
     query$start_date <- start_date
