@@ -26,7 +26,7 @@ query_sc_single <- function(query, start_date, end_date, config_path, override_d
     query$segment.id <- ""
   }
   
-  if(query$queryType == "overtime"){
+  if(query$queryType == "overtime") {
     data <- with(query, RSiteCatalyst::QueueOvertime(suite, start_date, end_date
                                          , metrics_clean, date.granularity = date.granularity, segment.id = segment.id))
   } else if (query$queryType == "trended") {
@@ -46,7 +46,7 @@ query_sc_single <- function(query, start_date, end_date, config_path, override_d
     data$datetime <- as.Date(data$datetime)
    }
   
-   if("name" %in% colnames(data) & length(query$elements) > 0){
+   if("name" %in% colnames(data) & length(query$elements) > 0) {
     setnames(data, "name", query$elements)
    }
    data[, query.name := query$queryName]
