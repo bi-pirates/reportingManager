@@ -28,15 +28,15 @@ query_sc_single <- function(query, start_date, end_date, config_path, override_d
   
   if(query$queryType == "overtime"){
     data <- with(query, RSiteCatalyst::QueueOvertime(suite, start_date, end_date
-                                         , metrics_clean, date.granularity, segment.id))
+                                         , metrics_clean, date.granularity = date.granularity, segment.id = segment.id))
   } else if (query$queryType == "trended") {
     data <- with(query, RSiteCatalyst::QueueTrended(suite, start_date, end_date
-                                        , metrics_clean, elements_clean, search_clean, segment.id
-                                        , date.granularity, top))
+                                        , metrics_clean, elements_clean, search = search_clean, segment.id = segment.id
+                                        , date.granularity = date.granularity, top = top))
   } else if (query$queryType == "ranked") {
     data <- with(query, RSiteCatalyst::QueueRanked(suite, start_date, end_date
-                                       , metrics_clean, elements_clean, search_clean
-                                       , segment.id, top))
+                                       , metrics_clean, elements_clean, search = search_clean
+                                       , segment.id = segment.id, top = top))
   }
   
   if("datetime" %in% colnames(data)){
