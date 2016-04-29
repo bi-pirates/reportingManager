@@ -4,7 +4,7 @@ query_sc_single <- function(query, start_date, end_date, config_path, override_d
 
  metrics_clean <- ifelse(invalid(query$metrics), "NA", strsplit(query$metrics, ","))[[1]]
  elements_clean <- ifelse(invalid(query$elements), "NA", strsplit(query$elements, ","))[[1]]
- search_clean <- ifelse(invalid(query$search), c(), strsplit(query$search, ","))[[1]]
+ search_clean <- ifelse(invalid(query$search), "", strsplit(query$search, ","))[[1]]
 
   if(override_dates){
     query$start_date <- start_date
@@ -51,6 +51,7 @@ query_sc_single <- function(query, start_date, end_date, config_path, override_d
   
   if(nrow(data) > 0) {
     data[, query := jsonlite::toJSON(query)]  
+    data[,query.name := query$queryName]
   }
   
   
