@@ -16,5 +16,6 @@ Imports:
     RGoogleAnalytics,
     jsonlite,
     data.table,
-    lubridate
+    lubridate,
+    dplyr
 RoxygenNote: 5.0.1
