@@ -39,13 +39,13 @@ query_sc_single <- function(query, start_date, end_date, config_path, override_d
                                        , segment.id = segment.id, top = top))
   }
   
+  if("datetime" %in% colnames(data)){
+    data$datetime <- as.Date(data$datetime)
+  }
+  
   data <- data.table(data)
   
   if(nrow(data) > 0) {
-   if("datetime" %in% colnames(data)){
-    data$datetime <- as.Date(data$datetime)
-   }
-  
    if("name" %in% colnames(data) & length(query$elements) > 0) {
     setnames(data, "name", query$elements)
    }
