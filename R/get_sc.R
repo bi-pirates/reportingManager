@@ -46,7 +46,7 @@ query_sc_single <- function(query, start_date, end_date, config_path, override_d
   data <- data.table(data)
   
   if(nrow(data) > 0) {
-   if("name" %in% colnames(data) & length(query$elements) > 0) {
+   if("name" %in% colnames(data) & !invalid(query$elements)) {
     setnames(data, "name", query$elements)
    }
    data[, query.name := query$queryName]
