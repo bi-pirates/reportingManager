@@ -51,9 +51,8 @@ query_sc_single <- function(query, start_date, end_date, config_path, override_d
   
   if(nrow(data) > 0) {
     data[, query := jsonlite::toJSON(query)]  
-    data[,query.name := query$queryName]
+    data[, query.name := query$queryName]
   }
-  
   
   return(data)
 }
