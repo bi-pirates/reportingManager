@@ -43,7 +43,7 @@ query_sc_single <- function(query, start_date, end_date, config_path, override_d
     data$datetime <- as.Date(data$datetime)
   }
   
-  if("name" %in% colnames(data)){
+  if("name" %in% colnames(data) & length(query$elements) > 0){
     setnames(data, "name", query$elements)
   }
 
