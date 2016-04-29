@@ -4,6 +4,7 @@ query_sc_single <- function(query, start_date, end_date, config_path, override_d
  
   metrics_clean <- ifelse(invalid(query$metrics), "NA", strsplit(query$metrics, ",")[[1]])
   elements_clean <- ifelse(invalid(query$elements), "NA", strsplit(query$elements, ",")[[1]])
+  search_clean <- ifelse(invalid(query$search), c(), strsplit(query$search, ",")[[1]])
 
   if(override_dates){
     query$start_date <- start_date
@@ -21,10 +22,6 @@ query_sc_single <- function(query, start_date, end_date, config_path, override_d
     query$top <- 5000
   }
   
-  if(invalid(query$search)) {
-    query$search <- c()
-  }
-
   if(invalid(query$segment.id)) {
     query$segment.id <- ""
   }
@@ -34,11 +31,11 @@ query_sc_single <- function(query, start_date, end_date, config_path, override_d
                                          , metrics_clean, date.granularity, segment.id))
   } else if (query$queryType == "trended") {
     data <- with(query, RSiteCatalyst::QueueTrended(suite, start_date, end_date
-                                        , metrics_clean, elements_clean, search, segment.id
+                                        , metrics_clean, elements_clean, search_clean, segment.id
                                         , date.granularity, top))
   } else if (query$queryType == "ranked") {
     data <- with(query, RSiteCatalyst::QueueRanked(suite, start_date, end_date
-                                       , metrics_clean, elements_clean, search
+                                       , metrics_clean, elements_clean, search_clean
                                        , segment.id, top))
   }
   
