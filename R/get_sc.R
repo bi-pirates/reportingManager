@@ -49,7 +49,8 @@ query_sc_single <- function(query, start_date, end_date, config_path, override_d
    }
     data <- data.table(data)
     data[, query.name := query$queryName]
-   data[, query := jsonlite::toJSON(query)]  
+    data[, reportSuite := query$suite]
+    data[, query := jsonlite::toJSON(query)]  
   }
   
   return(data)
