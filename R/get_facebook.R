@@ -1,4 +1,6 @@
 #' @import data.table
+#' @import Rfacebook
+
 NULL
 
 #' Authorize Facebook Insights access
@@ -97,5 +99,5 @@ query_generic <- function(query_function, queries_table, start_date, end_date, c
 #' }
 #' @export
 query_facebook <- function(queries_table, start_date, end_date, config_path = "config.json", token_path = "tokens/fbInsights_token", override_dates = TRUE, include_query_data = FALSE) {
-  query_generic(query_facebook_single, queries_table, start_date, end_date, config_path = "config.json", token_path = "tokens/fbInsights_token", override_dates = TRUE, include_query_data = FALSE)
+query_generic(query_facebook_single, queries_table, start_date, end_date, config_path = "config.json", token_path = "tokens/fbInsights_token", override_dates = TRUE, include_query_data = FALSE)
 }
