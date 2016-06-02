@@ -51,7 +51,9 @@ get_download_link <- function(file_id){ #returns file names & download links
   httr::stop_for_status(req)
   req <- httr::content(req)
   link <- as.list(req$exportLinks$`text/csv`)
-  names(link) <- req$title
+  if(length(link) != 0){
+    names(link) <- req$title
+  }
   return(link)
 }
 
@@ -80,7 +82,10 @@ get_sheet <- function(link){
 get_gdrive_queries <- function(config_path){
   config_data <- jsonlite::fromJSON(config_path)
   files <- get_query_folder_contents(config_data$google_drive)
-  links <- sapply(files, get_download_link, USE.NAMES=TRUE)
-  query_data <- lapply(links, get_sheet)
+  links <- sapply(files, get_download_link)
+  links <- links[sapply(links, function(x) length(x) > 0, USE.NAMES=TRUE)]
+  query_data <- lapply(links, function(x) get_sheet(x[[1]]))
+  names <- sapply(links, function(x) (names(x)))
+  names(query_data) <- names
   return(query_data)
 }
