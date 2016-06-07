@@ -1,4 +1,9 @@
+#' @import devtools
 #' @import data.table
+#' @import SocialMediaMineR
+#' @import lubridate
+#' @import magrittr
+devtools::install_github("pablobarbera/Rfacebook" , subdir="Rfacebook")
 #' @import Rfacebook
 
 NULL
@@ -10,7 +15,7 @@ NULL
 #'
 #' @param config_path path where the config.json file is located
 #' @param token_path path to the token file
-#' @param create_token whether a new token should be created (mandatory, if an existing token is not available in the dir tokens/)
+#' @param create_token whether a new token should be loadcreated (mandatory, if an existing token is not available in the dir tokens/)
 #' @return A google drive token in the (newly created?) \code{tokens/fbInsights_token} directory.
 #'
 #' @examples
@@ -18,6 +23,7 @@ NULL
 #' auth_fbInsights("config.json", create_token=TRUE)
 #' }
 #' @export
+
 auth_fbInsights <- function(config_path = "config.json", token_path = "tokens/fbInsights_token", create_token=TRUE){
   if(create_token){
     config_data <- jsonlite::fromJSON(config_path)
@@ -100,4 +106,131 @@ query_generic <- function(query_function, queries_table, start_date, end_date, c
 #' @export
 query_facebook <- function(queries_table, start_date, end_date, config_path = "config.json", token_path = "tokens/fbInsights_token", override_dates = TRUE, include_query_data = FALSE) {
 query_generic(query_facebook_single, queries_table, start_date, end_date, config_path = "config.json", token_path = "tokens/fbInsights_token", override_dates = TRUE, include_query_data = FALSE)
+}
+
+#' \code{query_facebook_pages} returns Facebook Page Data
+#' @param facebookPages list of Facebook Page IDs
+#' @param start_date start date as character string in \code{"\%Y\/\%m\/\%d"} format
+#' @param end_date end date as character string in \code{"\%Y\/\%m\/\%d"} format
+#' @param token path where the config.json file is located
+#' @return A data.table filled with great, interesting facebook page date!!
+#'
+#' @examples
+#' \dontrun{
+#' query_facebook_pages("AudiDE", "2016/01/01", "2016/05/01")
+#' }
+#' @export
+query_facebook_pages <- function(facebookPages, start_date, end_date, token_path = "tokens/fbInsights_token"){
+  
+  pages <- list()
+  likes <- list()
+  load(token_path)
+  
+  for(i in 1:length(facebookPages)){
+    pages[[i]] <- getPage(page = facebookPages[i], token = facebook_token, since = start_date, until = end_date, n = 1e4)
+    likes[[i]] <- as.data.table(SocialMediaMineR::get_facebook(paste0("https://www.facebook.com/",facebookPages[i])))
+    pages[[i]] <- cbind(pages[[i]], "likes_total" = likes[[i]]$like_count)
+  }
+  saveRDS(pages, file = "pages_rawData.rds")
+  
+  pages <- as.data.table(do.call(rbind, pages))
+  pages[, date := as.POSIXct(created_time)]
+  pages[, month := lubridate::month(date, label = TRUE)]
+  pages[, quarter := lubridate::quarter(date, with_year = TRUE) %>% as.character]
+  pages[, year := lubridate::year(date) %>% as.character]
+  pages[, totalEngagement := (likes_count + comments_count + shares_count), by = id]
+  pages[, averageER := sum(totalEngagement)/likes_total, by = .(from_name, month)]
+  
+  return(pages)  
+}
+
+#' \code{query_facebook_posts} returns Facebook Post Data - query_facebook_pages needed to run before!
+#' @param token path where the config.json file is located
+#' @return A data.table filled with great, interesting facebook post data!
+#'
+#' @examples
+#' \dontrun{
+#' query_facebook_posts()
+#' }
+#' @export
+query_facebook_posts <- function(token_path = "tokens/fbInsights_token"){
+  
+  pages <- readRDS("pages_rawData.rds")
+
+  posts <- list()
+  postData <- list()
+  insights <- list()
+  load(token_path)
+  
+  for(x in 1:length(pages)){
+    for(i in 1:nrow(pages[[x]])){
+      posts[[i]] <- getPost(post = pages[[x]]$id[i], token = facebook_token, n = 5)
+      insights[[i]] <- getInsights(pages[[x]]$id[i], token = facebook_token, "post_impressions_unique", period = "lifetime")      
+      posts[[i]] <- cbind(posts[[i]]$post, "post_impressions_unique" = insights[[i]]$value)
+      print(paste0(i," von ", nrow(pages[[x]])))
+    }
+    if(length(postData) == 0){
+      postData <- c(posts)
+    }else{
+      postData <- c(postData, posts)
+      posts <- list()
+    }
+  }
+  
+  postData <- as.data.table(do.call(rbind, postData))
+  postData[, date := as.POSIXct(created_time)]
+  postData[, month := lubridate::month(date, label = TRUE)]
+  postData[, quarter := lubridate::quarter(date, with_year = TRUE) %>% as.character]
+  postData[, year := lubridate::year(date) %>% as.character]
+  postData[, totalEngagement := (likes_count + comments_count + shares_count), by = id]
+  postData[, RER := totalEngagement/post_impressions_unique, by = id]
+  postData[RER == "Inf", RER := 0]
+  postData[, averageRER := mean(RER, na.rm = TRUE), by = .(from_name, month)]
+  
+  return(postData)  
+}
+
+#' \code{query_facebook_competitor_posts} returns Facebook Post Data from not owned pages - query_facebook_pages needed to run before!
+#' @param token path where the config.json file is located
+#' @return A data.table filled with great, interesting facebook post data!
+#'
+#' @examples
+#' \dontrun{
+#' query_facebook_competitor_posts()
+#' }
+#' @export
+query_facebook_competitor_posts <- function(token_path = "tokens/fbInsights_token"){
+  
+  pages <- readRDS("pages_rawData.rds")
+  
+  posts <- list()
+  postData <- list()
+  likes <- list()
+  load(token_path)
+  
+  for(x in 1:length(pages)){
+    for(i in 1:nrow(pages[[x]])){
+      posts[[i]] <- getPost(post = pages[[x]]$id[i], token = facebook_token, n = 5)
+      likes[[i]] <- pages[[x]]$likes_total[i]
+      posts[[i]] <- cbind(posts[[i]]$post, "likes_total" = likes[[i]])
+      print(paste0(i," von ", nrow(pages[[x]])))
+    }
+    if(length(postData) == 0){
+      postData <- c(posts)
+    }else{
+      postData <- c(postData, posts)
+      posts <- list()
+    }
+  }
+  
+  postData <- as.data.table(do.call(rbind, postData))
+  postData[, date := as.POSIXct(created_time)]
+  postData[, month := lubridate::month(date, label = TRUE)]
+  postData[, quarter := lubridate::quarter(date, with_year = TRUE) %>% as.character]
+  postData[, year := lubridate::year(date) %>% as.character]
+  postData[, totalEngagement := (likes_count + comments_count + shares_count), by = id]
+  postData[, ER := totalEngagement/likes_total, by = id]
+  postData[ER == "Inf", ER := 0]
+
+  return(postData)  
 }

@@ -12,7 +12,7 @@ auth_fbInsights(config_path = "config.json",
 
 \item{token_path}{path to the token file}
 
-\item{create_token}{whether a new token should be created (mandatory, if an existing token is not available in the dir tokens/)}
+\item{create_token}{whether a new token should be loadcreated (mandatory, if an existing token is not available in the dir tokens/)}
 }
 \value{
 A google drive token in the (newly created?) \code{tokens/fbInsights_token} directory.
