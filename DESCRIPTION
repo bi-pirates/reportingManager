@@ -17,5 +17,9 @@ Imports:
     jsonlite,
     data.table,
     lubridate,
-    dplyr
+    dplyr,
+    RSiteCatalyst, 
+    SocialMediaMineR,
+    magrittr,
+    Rfacebook
 RoxygenNote: 5.0.1

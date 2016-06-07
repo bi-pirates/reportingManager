@@ -85,7 +85,9 @@ get_gdrive_queries <- function(config_path){
   links <- sapply(files, get_download_link)
   links <- links[sapply(links, function(x) length(x) > 0, USE.NAMES=TRUE)]
   query_data <- lapply(links, function(x) get_sheet(x[[1]]))
-  names <- sapply(links, function(x) (names(x)))
-  names(query_data) <- names
+  if(is.null(names(query_data))){
+    names <- sapply(links, function(x) (names(x)))
+    names(query_data) <- names  
+  }
   return(query_data)
 }
