@@ -155,7 +155,7 @@ query_facebook_pages <- function(facebookPages, start_date, end_date, token_path
 #' query_facebook_posts(metrics = c("post_impressions_organic","post_impressions_paid"))
 #' }
 #' @export
-query_facebook_posts <- function(token_path = "tokens/fbInsights_token", metrics = c("post_impressions_unique", "post_impressions_paid") ){
+query_facebook_posts <- function(token_path = "tokens/fbInsights_token", metrics = c("post_impressions_unique") ){
 
   pages <- readRDS("pages_rawData.rds")
 
@@ -163,7 +163,14 @@ query_facebook_posts <- function(token_path = "tokens/fbInsights_token", metrics
   postData <- list()
   insights <- list()
   load(token_path)
+
+  if(!"post_impressions_unique" %in% metrics){
+    metrics <- c(metrics, "post_impressions_unique")
+  }
+
   # metrics = queries_all_post
+  # x <- 1
+  # i <- 3
   for(x in 1:length(pages)){
     for(i in 1:nrow(pages[[x]])){
       posts[[i]] <- getPost(post = pages[[x]]$id[i], token = facebook_token, n = 5)
@@ -174,16 +181,19 @@ query_facebook_posts <- function(token_path = "tokens/fbInsights_token", metrics
       insights$. <- NULL
       posts[[i]] <- cbind(posts[[i]]$post, insights)
       print(paste0(i," von ", nrow(pages[[x]])))
+      insights <- list()
     }
     if(length(postData) == 0){
       postData <- c(posts)
+      insights <- list()
     }else{
       postData <- c(postData, posts)
       posts <- list()
+      insights <- list()
     }
   }
 
-  postData <- as.data.table(do.call(rbind, postData))
+  postData <- as.data.table(do.call(bind_rows, postData))
   postData[, date := as.POSIXct(created_time)]
   postData[, month := lubridate::month(date, label = TRUE)]
   postData[, quarter := lubridate::quarter(date, with_year = TRUE) %>% as.character]
