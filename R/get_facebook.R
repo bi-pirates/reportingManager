@@ -152,10 +152,10 @@ query_facebook_pages <- function(facebookPages, start_date, end_date, token_path
 #'
 #' @examples
 #' \dontrun{
-#' query_facebook_posts()
+#' query_facebook_posts(metrics = c("post_impressions_organic","post_impressions_paid"))
 #' }
 #' @export
-query_facebook_posts <- function(token_path = "tokens/fbInsights_token"){
+query_facebook_posts <- function(token_path = "tokens/fbInsights_token", metrics = c("post_impressions_unique", "post_impressions_paid") ){
 
   pages <- readRDS("pages_rawData.rds")
 
@@ -167,8 +167,11 @@ query_facebook_posts <- function(token_path = "tokens/fbInsights_token"){
   for(x in 1:length(pages)){
     for(i in 1:nrow(pages[[x]])){
       posts[[i]] <- getPost(post = pages[[x]]$id[i], token = facebook_token, n = 5)
-      insights[[i]] <- getInsights(pages[[x]]$id[i], token = facebook_token, "post_impressions_unique", period = "lifetime")
-      posts[[i]] <- cbind(posts[[i]]$post, "post_impressions_unique" = insights[[i]]$value)
+      insights[[i]] <- getInsights(pages[[x]]$id[i], token = facebook_token, metrics, period = "lifetime")
+      insights <- as.data.table(do.call(rbind, insights[[i]]))[,.(variable = name, value)]
+      insights <- dcast(insights, .~ variable)
+      insights$. <- NULL
+      posts[[i]] <- cbind(posts[[i]]$post, insights)
       print(paste0(i," von ", nrow(pages[[x]])))
     }
     if(length(postData) == 0){
