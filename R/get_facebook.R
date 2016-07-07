@@ -163,12 +163,13 @@ query_facebook_posts <- function(token_path = "tokens/fbInsights_token", metrics
   postData <- list()
   insights <- list()
   load(token_path)
-
+  # metrics = queries_all_post
   for(x in 1:length(pages)){
     for(i in 1:nrow(pages[[x]])){
       posts[[i]] <- getPost(post = pages[[x]]$id[i], token = facebook_token, n = 5)
       insights[[i]] <- getInsights(pages[[x]]$id[i], token = facebook_token, metrics, period = "lifetime")
-      insights <- as.data.table(do.call(rbind, insights[[i]]))[,.(variable = name, value)]
+      insights <- as.data.table(do.call(bind_rows, insights[[i]]))
+      insights <- insights[is.na(variable), variable := name][,.(variable, value)]
       insights <- dcast(insights, .~ variable)
       insights$. <- NULL
       posts[[i]] <- cbind(posts[[i]]$post, insights)
