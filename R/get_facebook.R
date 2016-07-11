@@ -63,12 +63,19 @@ query_facebook_single <- function(query, start_date, end_date
     # data <- httr::content(req)$data[[1]]
     #data_points <- rbindlist(lapply(data$values, function(x) as.list(c(end_time = unlist(x$end_time), unlist(x$value)))), fill=TRUE) #date conversion should be added here
 
-    data_points <- data[, .(end_time, value)]
+    if("variable" %in% colnames(data)){
+      data_points <- data[, .(end_time, variable, value)]
+      meldIds <- c("date", "metric", "variable")
+    }else{
+      data_points <- data[, .(end_time, value)]
+      meldIds <- c("date", "metric")
+    }
+
     data_points[, metric := data$title]
     # data_points <- data.table(data_points)
     data_points[, date := as.character(as.Date(end_time, format = "%Y-%m-%dT"))]
     data_points[, end_time := NULL]
-    data_points <- reshape2::melt(data_points, id.var = c("date", "metric"), variable.name = "interactionType")
+    data_points <- reshape2::melt(data_points, id.var = meldIds, variable.name = "interactionType")
     data_points[, page.name := query["Page"]]
     data_points[, query.data := jsonlite::toJSON(query)]
     return(data_points)
