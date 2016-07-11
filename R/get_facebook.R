@@ -24,7 +24,7 @@ NULL
 #' }
 #' @export
 
-auth_fbInsights <- function(config_path = "config.json", token_path = "tokens/fbInsights_token", create_token=TRUE){
+auth_fbInsights <- function(config_path = "config.json", token_path = "tokens/fbInsights_token", create_token=TRUE, extended_permissions = TRUE ){
   if(create_token){
     config_data <- jsonlite::fromJSON(config_path)
 
@@ -33,7 +33,7 @@ auth_fbInsights <- function(config_path = "config.json", token_path = "tokens/fb
     myapp <- with(config_data$facebook_insights, httr::oauth_app("facebook", app_id, app_secret))
     #facebook_token <- httr::oauth2.0_token(httr::oauth_endpoints("facebook"), myapp$key, scope = scope,
     #                                 type = "application/x-www-form-urlencoded")
-    facebook_token <- fbOAuth(app_id = myapp$key, app_secret = myapp$secret, extended_permissions = TRUE)
+    facebook_token <- fbOAuth(app_id = myapp$key, app_secret = myapp$secret, extended_permissions = extended_permissions)
     dir.create(path = "tokens", showWarnings = FALSE)
     save(facebook_token, file = token_path)
   }
@@ -46,7 +46,6 @@ query_facebook_single <- function(query, start_date, end_date
                               , config_path, token_path, override_dates){
     load(token_path)
 
-
     url <- with(query, sprintf("https://graph.facebook.com/%s/insights/%s", Page, Metric))
 
     # Fill in missing dates & override date field if necessary
@@ -56,16 +55,19 @@ query_facebook_single <- function(query, start_date, end_date
     if(is.null(query["end.date"]) | override_dates) {
       query["end.date"] <- end_date
     }
-    query["start.date"] <- as.character(max(lubridate::floor_date(as.Date(query$start.date) - lubridate::days(90), "month"), Sys.Date() - 90)) #Data only available 90 days back
+    #query["start.date"] <- as.character(max(lubridate::floor_date(as.Date(query$start.date) - lubridate::days(90), "month"), Sys.Date() - 90)) #Data only available 90 days back
+    data <- as.data.table(getInsights(object_id = query$Page, token = facebook_token, metric = query$Metric, period = query$period, parms = paste0("&since=",start_date,"&until=",end_date)))
 
-    req <- httr::GET(url, httr::config(token = facebook_token), query=list(since=query$start.date, until=query$end_date, period=query$period))
-    httr::stop_for_status(req)
-    data <- httr::content(req)$data[[1]]
-    data_points <- rbindlist(lapply(data$values, function(x) as.list(c(end_time = unlist(x$end_time), unlist(x$value)))), fill=TRUE) #date conversion should be added here
+    # req <- httr::GET(url, httr::config(token = facebook_token), query=list(since=query$start.date, until=query$end_date, period=query$period))
+    # httr::stop_for_status(req)
+    # data <- httr::content(req)$data[[1]]
+    #data_points <- rbindlist(lapply(data$values, function(x) as.list(c(end_time = unlist(x$end_time), unlist(x$value)))), fill=TRUE) #date conversion should be added here
+
+    data_points <- data[, .(end_time, value)]
     data_points[, metric := data$title]
-    data_points <- data.table(data_points)
-    data_points[,date := as.character(as.Date(end_time, format = "%Y-%m-%dT"))]
-    data_points[,end_time := NULL]
+    # data_points <- data.table(data_points)
+    data_points[, date := as.character(as.Date(end_time, format = "%Y-%m-%dT"))]
+    data_points[, end_time := NULL]
     data_points <- reshape2::melt(data_points, id.var = c("date", "metric"), variable.name = "interactionType")
     data_points[, page.name := query["Page"]]
     data_points[, query.data := jsonlite::toJSON(query)]
@@ -86,7 +88,6 @@ query_generic <- function(query_function, queries_table, start_date, end_date, c
   }
   return(results)
 }
-
 
 #' Fetch clean, streamlined Facebook Insights Data, from a data.table of queries
 #'
@@ -170,7 +171,7 @@ query_facebook_posts <- function(token_path = "tokens/fbInsights_token", metrics
 
   # metrics = queries_all_post
   # x <- 1
-  # i <- 3
+  # i <- 1
   for(x in 1:length(pages)){
     for(i in 1:nrow(pages[[x]])){
       posts[[i]] <- getPost(post = pages[[x]]$id[i], token = facebook_token, n = 5)
