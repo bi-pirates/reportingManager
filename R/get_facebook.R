@@ -12,19 +12,18 @@ NULL
 #'
 #' \code{auth_fbInsights} generates a token which is saved to \code{tokens/fbInsights_token} and used for accessing Facebook Insights
 #'
-#'
 #' @param config_path path where the config.json file is located
 #' @param token_path path to the token file
 #' @param create_token whether a new token should be loadcreated (mandatory, if an existing token is not available in the dir tokens/)
+#' @param extended_permissons If TRUE, the token will give access to some of the authenticated user’s private information (birthday, hometown, location, relationships) and that of his/her friends, and permissions to post status updates as well as to access checkins, likes, and the user’s newsfeed If FALSE, token will give access only to public information.
 #' @return A google drive token in the (newly created?) \code{tokens/fbInsights_token} directory.
-#'
 #' @examples
 #' \dontrun{
-#' auth_fbInsights("config.json", create_token=TRUE)
+#' auth_fbInsights("config.json", create_token=TRUE, extended_permissions = TRUE)
 #' }
 #' @export
 
-auth_fbInsights <- function(config_path = "config.json", token_path = "tokens/fbInsights_token", create_token=TRUE, extended_permissions = TRUE ){
+auth_fbInsights <- function(config_path = "config.json", token_path = "tokens/fbInsights_token", create_token=TRUE, extended_permissions = TRUE){
   if(create_token){
     config_data <- jsonlite::fromJSON(config_path)
 
@@ -127,7 +126,7 @@ query_generic(query_facebook_single, queries_table, start_date, end_date, config
 #'
 #' @examples
 #' \dontrun{
-#' query_facebook_pages("AudiDE", "2016/01/01", "2016/05/01")
+#' query_facebook_pages("<Page/ID>", "2016/01/01", "2016/05/01")
 #' }
 #' @export
 query_facebook_pages <- function(facebookPages, start_date, end_date, token_path = "tokens/fbInsights_token"){
@@ -141,6 +140,7 @@ query_facebook_pages <- function(facebookPages, start_date, end_date, token_path
     likes[[i]] <- as.data.table(SocialMediaMineR::get_facebook(paste0("https://www.facebook.com/",facebookPages[i])))
     pages[[i]] <- cbind(pages[[i]], "likes_total" = likes[[i]]$like_count)
   }
+  # save RDS for query_facebook_posts function
   saveRDS(pages, file = "pages_rawData.rds")
 
   pages <- as.data.table(do.call(rbind, pages))
@@ -176,9 +176,6 @@ query_facebook_posts <- function(token_path = "tokens/fbInsights_token", metrics
     metrics <- c(metrics, "post_impressions_unique")
   }
 
-  # metrics = queries_all_post
-  # x <- 1
-  # i <- 1
   for(x in 1:length(pages)){
     for(i in 1:nrow(pages[[x]])){
       posts[[i]] <- getPost(post = pages[[x]]$id[i], token = facebook_token, n = 5)
