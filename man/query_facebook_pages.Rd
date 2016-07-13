@@ -24,7 +24,7 @@ A data.table filled with great, interesting facebook page date!!
 }
 \examples{
 \dontrun{
-query_facebook_pages("AudiDE", "2016/01/01", "2016/05/01")
+query_facebook_pages("<Page/ID>", "2016/01/01", "2016/05/01")
 }
 }
 
