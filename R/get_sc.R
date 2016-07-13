@@ -39,29 +39,19 @@ query_sc_single <- function(query, start_date, end_date, config_path, override_d
                                        , segment.id = segment.id, top = top))
   }
   
-  if(nrow(data) > 0) {
-   if("datetime" %in% colnames(data)){
-    data$datetime <- as.Date(data$datetime)
-   }
-  
-<<<<<<< HEAD
-   if("name" %in% colnames(data) & !is.na(query$elements)) {
-    setnames(data, "name", query$elements)
-   }
-    data <- data.table(data)
-    data[, query.name := query$queryName]
-    data[, reportSuite := query$suite]
-    data[, query := jsonlite::toJSON(query)]  
-=======
   data <- data.table(data)
   
   if(nrow(data) > 0) {
+    if("datetime" %in% colnames(data)){
+      data$datetime <- as.Date(data$datetime)
+    }
+    
    if("name" %in% colnames(data) & !invalid(query$elements)) {
     setnames(data, "name", query$elements)
    }
    data[, query.name := query$queryName]
+   data[, reportSuite := query$suite]
    data[, query := jsonlite::toJSON(query)]  
->>>>>>> 24803eacf82d1e0fe874430efcc56f05454a3700
   }
   
   return(data)

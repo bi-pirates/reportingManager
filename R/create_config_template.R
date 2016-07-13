@@ -22,11 +22,7 @@ createConfigTemplate <- function(config_path = ""){
         "client_id": "______.apps.googleusercontent.com",
         "client_secret":"_____",
         "query_folder_id":"______"
-<<<<<<< HEAD
-      }, { "site_catalyst": {
-=======
       }, "site_catalyst": {
->>>>>>> RazorfishGermany/master
         "client_id": "____",
         "client_secret": "____"
       }
