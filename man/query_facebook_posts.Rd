@@ -4,7 +4,8 @@
 \alias{query_facebook_posts}
 \title{\code{query_facebook_posts} returns Facebook Post Data - query_facebook_pages needed to run before!}
 \usage{
-query_facebook_posts(token_path = "tokens/fbInsights_token")
+query_facebook_posts(token_path = "tokens/fbInsights_token",
+  metrics = c("post_impressions_unique"))
 }
 \arguments{
 \item{token}{path where the config.json file is located}
@@ -17,7 +18,7 @@ A data.table filled with great, interesting facebook post data!
 }
 \examples{
 \dontrun{
-query_facebook_posts()
+query_facebook_posts(metrics = c("post_impressions_organic","post_impressions_paid"))
 }
 }
 

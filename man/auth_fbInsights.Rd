@@ -5,7 +5,8 @@
 \title{Authorize Facebook Insights access}
 \usage{
 auth_fbInsights(config_path = "config.json",
-  token_path = "tokens/fbInsights_token", create_token = TRUE)
+  token_path = "tokens/fbInsights_token", create_token = TRUE,
+  extended_permissions = TRUE)
 }
 \arguments{
 \item{config_path}{path where the config.json file is located}
@@ -13,6 +14,8 @@ auth_fbInsights(config_path = "config.json",
 \item{token_path}{path to the token file}
 
 \item{create_token}{whether a new token should be loadcreated (mandatory, if an existing token is not available in the dir tokens/)}
+
+\item{extended_permissons}{If TRUE, the token will give access to some of the authenticated user’s private information (birthday, hometown, location, relationships) and that of his/her friends, and permissions to post status updates as well as to access checkins, likes, and the user’s newsfeed If FALSE, token will give access only to public information.}
 }
 \value{
 A google drive token in the (newly created?) \code{tokens/fbInsights_token} directory.
@@ -22,7 +25,7 @@ A google drive token in the (newly created?) \code{tokens/fbInsights_token} dire
 }
 \examples{
 \dontrun{
-auth_fbInsights("config.json", create_token=TRUE)
+auth_fbInsights("config.json", create_token=TRUE, extended_permissions = TRUE)
 }
 }
 
