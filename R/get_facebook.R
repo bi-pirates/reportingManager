@@ -110,7 +110,7 @@ query_generic <- function(query_function, queries_table, start_date, end_date, c
 #'
 #' @examples
 #' \dontrun{
-#' query_facebook(queries_table, "2015-01-01", "2015-02-01", config_path = "config.json", override_dates = TRUE)
+#' query_facebook(queries_table, "2015-01-01", "2015-02-01", config_path = "config.json", override_dates = TRUE, include_query_data = TRUE)
 #' }
 #' @export
 query_facebook <- function(queries_table, start_date, end_date, config_path = "config.json", token_path = "tokens/fbInsights_token", override_dates = TRUE, include_query_data = FALSE) {
