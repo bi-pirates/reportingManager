@@ -180,9 +180,14 @@ query_facebook_posts <- function(token_path = "tokens/fbInsights_token", metrics
     for(i in 1:nrow(pages[[x]])){
       posts[[i]] <- getPost(post = pages[[x]]$id[i], token = facebook_token, n = 5)
       insights[[i]] <- getInsights(pages[[x]]$id[i], token = facebook_token, metrics, period = "lifetime")
-      insights <- as.data.table(do.call(bind_rows, insights[[i]]))
-      insights <- insights[is.na(variable), variable := name][,.(variable, value)]
-      insights <- dcast(insights, .~ variable)
+      insights <- as.data.table(do.call(bind_rows, insights))
+      if("variable" %in% colnames(insights)){
+        insights <- insights[is.na(variable), variable := name][,.(variable, value)]
+        insights <- dcast(insights, .~ variable)
+      }else{
+        insights <- insights[,.(name, value)]
+        insights <- dcast(insights, .~ name)
+      }
       insights$. <- NULL
       posts[[i]] <- cbind(posts[[i]]$post, insights)
       print(paste0(i," von ", nrow(pages[[x]])))
