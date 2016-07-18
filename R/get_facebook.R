@@ -54,7 +54,7 @@ query_facebook_single <- function(query, start_date, end_date
     if(is.null(query["end.date"]) | override_dates) {
       query["end.date"] <- end_date
     }
-    #query["start.date"] <- as.character(max(lubridate::floor_date(as.Date(query$start.date) - lubridate::days(90), "month"), Sys.Date() - 90)) #Data only available 90 days back
+    query["start.date"] <- as.character(max(lubridate::floor_date(as.Date(query$start.date) - lubridate::days(90), "month"), Sys.Date() - 90)) #Data only available 90 days back
     data <- as.data.table(getInsights(object_id = query$Page, token = facebook_token, metric = query$Metric, period = query$period, parms = paste0("&since=",start_date,"&until=",end_date)))
 
     # req <- httr::GET(url, httr::config(token = facebook_token), query=list(since=query$start.date, until=query$end_date, period=query$period))
@@ -180,9 +180,14 @@ query_facebook_posts <- function(token_path = "tokens/fbInsights_token", metrics
     for(i in 1:nrow(pages[[x]])){
       posts[[i]] <- getPost(post = pages[[x]]$id[i], token = facebook_token, n = 5)
       insights[[i]] <- getInsights(pages[[x]]$id[i], token = facebook_token, metrics, period = "lifetime")
-      insights <- as.data.table(do.call(bind_rows, insights[[i]]))
-      insights <- insights[is.na(variable), variable := name][,.(variable, value)]
-      insights <- dcast(insights, .~ variable)
+      insights <- as.data.table(do.call(bind_rows, insights))
+      if("variable" %in% colnames(insights)){
+        insights <- insights[is.na(variable), variable := name][,.(variable, value)]
+        insights <- dcast(insights, .~ variable)
+      }else{
+        insights <- insights[,.(name, value)]
+        insights <- dcast(insights, .~ name)
+      }
       insights$. <- NULL
       posts[[i]] <- cbind(posts[[i]]$post, insights)
       print(paste0(i," von ", nrow(pages[[x]])))
