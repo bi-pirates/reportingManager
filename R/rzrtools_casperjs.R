@@ -16,3 +16,6 @@ install_casperjs <- function(){
   system(sprintf("npm install --prefix %s -g casperjs@1.1.0-beta4",
     system.file(package = "FourSeasons")))
 }
+
+# Note:
+# Fix Weird Casper issue, "I'm `fs` modules": http://stackoverflow.com/questions/31572054/web-scrapping-with-casperjs-returns-strange-error-that-isnt-documented
