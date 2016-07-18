@@ -54,7 +54,7 @@ query_facebook_single <- function(query, start_date, end_date
     if(is.null(query["end.date"]) | override_dates) {
       query["end.date"] <- end_date
     }
-    #query["start.date"] <- as.character(max(lubridate::floor_date(as.Date(query$start.date) - lubridate::days(90), "month"), Sys.Date() - 90)) #Data only available 90 days back
+    query["start.date"] <- as.character(max(lubridate::floor_date(as.Date(query$start.date) - lubridate::days(90), "month"), Sys.Date() - 90)) #Data only available 90 days back
     data <- as.data.table(getInsights(object_id = query$Page, token = facebook_token, metric = query$Metric, period = query$period, parms = paste0("&since=",start_date,"&until=",end_date)))
 
     # req <- httr::GET(url, httr::config(token = facebook_token), query=list(since=query$start.date, until=query$end_date, period=query$period))
