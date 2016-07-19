@@ -8,7 +8,7 @@
 #' @return NULL
 #' @export
 buildReport <- function(rmarkdown_path, output_dir = getwd(), output_file, params){
-  reportingManager::install_casperjs()
+  install_casperjs()
   print("Successfully installed dependencies.")
 
   # Render HTML Report
@@ -19,5 +19,5 @@ buildReport <- function(rmarkdown_path, output_dir = getwd(), output_file, param
   # Render PDF Report
   htmlPath <- paste0(output_dir, "/", output_file, ".html")
   pdfPath <- paste0(output_dir, "/", output_file, ".pdf")
-  reportingManager::casperHTMLtoPDF(htmlPath, pdfPath)
+  casperHTMLtoPDF(htmlPath, pdfPath)
 }
