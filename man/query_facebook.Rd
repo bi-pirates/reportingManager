@@ -29,7 +29,7 @@ A data.table filled with great, interesting googleAnalytics data!!
 }
 \examples{
 \dontrun{
-query_facebook(queries_table, "2015-01-01", "2015-02-01", config_path = "config.json", override_dates = TRUE, include_query_data = TRUE)
+query_facebook(queries_table, "2015-01-01", "2015-02-01", config_path = "config.json", override_dates = TRUE)
 }
 }
 
