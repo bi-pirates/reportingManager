@@ -21,5 +21,6 @@ Imports:
     RSiteCatalyst, 
     SocialMediaMineR,
     magrittr,
-    Rfacebook
+    Rfacebook,
+    rmarkdown
 RoxygenNote: 5.0.1
