@@ -112,15 +112,29 @@ active_queries <- function(path = ""){
 #' }
 #' @export
 getDBdata <- function(queries, config_path = "config.json"){
+  con <- dbConnect_withConfig(config_path)
+  rs <- lapply(queries, function(x) data.table::data.table(DBI::dbGetQuery(con, x)))
+  DBI::dbDisconnect(con)
+  return(rs)
+}
+
+#' Connect to DB using config.json file
+#'
+#' Creates a connection object to a mysql DB based on a json configuration
+#'
+#' @param config_path Path to the config.json object.
+#'
+#' @return con Config object
+#' @export
+dbConnect_withConfig <- function(config_path){
   config_data <- jsonlite::fromJSON(config_path)
   if(config_data$sql_config$engine == "mysql") {
     con <- with(config_data$sql_config, DBI::dbConnect(RMySQL::MySQL(), dbname = db_name
                                                        , host = host, user = user, password = pwd))
-    DBI::dbGetQuery(con, "SET NAMES utf8")
+  DBI::dbGetQuery(con, "SET NAMES utf8")
   } else {
     warning("RDBMS besides mysql not supported at this time.")
   }
-  rs <- lapply(queries, function(x) data.table::data.table(DBI::dbGetQuery(con, x)))
-  DBI::dbDisconnect(con)
-  return(rs)
+
+  return(con)
 }
