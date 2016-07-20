@@ -15,7 +15,7 @@ buildReport <- function(rmarkdown_path, output_file, output_dir = getwd(), param
 
   # Render HTML Report
   rmarkdown::render(rmarkdown_path, envir = envir,
-                    output_dir = output_dir, output_file = output_file,
+                    output_dir = output_dir, output_file = paste0(output_file,".html"),
                     params = params)
 
   # Render PDF Report
