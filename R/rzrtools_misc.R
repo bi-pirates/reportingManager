@@ -28,5 +28,5 @@ executeDataTableQuery <- function(query){eval(parse(text = query))}
 #' # writeMarkdown("# Headline")
 #' @export
 writeMarkdown <- function(input){
-  cat(I(input),"\n")
+  return(paste0("cat(I(",input,"),'\n')"))
 }
