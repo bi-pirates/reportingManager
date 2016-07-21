@@ -1,10 +1,6 @@
 #' @import data.table
 NULL
 
-# jsonlite
-# RMySQL
-# data.table
-
 #' Creates a queries folder as well as a template config.json doc
 #'
 #' \code{init_queries} Sets up directory for reading sql queries out of a queries directory
