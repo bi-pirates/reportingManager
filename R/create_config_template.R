@@ -25,6 +25,12 @@ createConfigTemplate <- function(config_path = ""){
       }, "site_catalyst": {
         "client_id": "____",
         "client_secret": "____"
+      }, "sql_config": {
+        "engine": "mysql",
+        "db_name": "___",
+        "host": "__",
+        "user": "__",
+        "pwd": "__"
       }
     }'
   if(!file.exists(paste0(config_path, "config.json"))){
