@@ -13,14 +13,12 @@ buildReport <- function(rmarkdown_path, output_file = "report", output_dir = get
   install_casperjs()
   print("Successfully installed dependencies.")
 
-  htmlPath <- paste0(output_dir, "/", output_file, ".html")
-  pdfPath <- paste0(output_dir, "/", output_file, ".pdf")
-
   # Render HTML Report
   rmarkdown::render(rmarkdown_path, envir = envir,
-                    output_dir = output_dir, output_file = html_path,
+                    output_dir = output_dir, output_file = paste0(output_file, ".html"),
                     params = params)
 
   # Render PDF Report
-  casperHTMLtoPDF(htmlPath, pdfPath)
+  casperHTMLtoPDF(paste0(output_dir, "/", output_file, ".html"),
+    paste0(output_dir, "/", output_file, ".pdf"))
 }
