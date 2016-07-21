@@ -17,16 +17,3 @@ fm_pct <- function(num){paste0(round(num, 2), "%")}
 #' Execute Data Table Query
 #' @export
 executeDataTableQuery <- function(query){eval(parse(text = query))}
-
-#' Write Mardkown
-#'
-#' Get Markdown syntax to write text
-#' @param input String
-#'
-#' @return RETURN mardown syntax with string
-#' @examples
-#' # writeMarkdown("# Headline")
-#' @export
-writeMarkdown <- function(input){
-  return(paste0("cat(I(",input,"),'\n')"))
-}
