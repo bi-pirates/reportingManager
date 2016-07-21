@@ -4,16 +4,20 @@
 \alias{buildReport}
 \title{Build an Rmarkdown report into a PDF}
 \usage{
-buildReport(rmarkdown_path, output_dir = getwd(), output_file, params)
+buildReport(rmarkdown_path, output_name = "report", output_dir = getwd(),
+  params = list(), envir = new.env())
 }
 \arguments{
 \item{rmarkdown_path}{path of the rmarkdown file}
 
+\item{output_name}{name of the report file on output, without file suffix}
+
 \item{output_dir}{directory the report should be written to}
 
-\item{output_file}{name of the report file on output}
-
 \item{params}{parameters to be passed on to the rmarkdown file}
+
+\item{envir}{environment which should be used to execute rmarkdown::render;
+often useful to specify a new environment including the reporting package, e.g. \code{new.env(parent = loadNamespace("packageName"))}}
 }
 \description{
 Build an Rmarkdown report into a PDF

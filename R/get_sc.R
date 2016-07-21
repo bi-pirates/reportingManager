@@ -1,11 +1,11 @@
 invalid <- function(x) { is.na(x) | is.null(x) | x == ""}
 
 query_sc_single <- function(query, start_date, end_date, config_path, override_dates = TRUE) { 
-
- metrics_clean <- ifelse(invalid(query$metrics), "NA", strsplit(query$metrics, ","))[[1]]
- elements_clean <- ifelse(invalid(query$elements), "NA", strsplit(query$elements, ","))[[1]]
- search_clean <- ifelse(invalid(query$search), "", strsplit(query$search, ","))[[1]]
-
+  
+  metrics_clean <- ifelse(invalid(query$metrics), "NA", strsplit(query$metrics, ","))[[1]]
+  elements_clean <- ifelse(invalid(query$elements), "NA", strsplit(query$elements, ","))[[1]]
+  search_clean <- ifelse(invalid(query$search), "", strsplit(query$search, ","))[[1]]
+  
   if(override_dates){
     query$start_date <- start_date
     query$end_date <- end_date
@@ -28,15 +28,15 @@ query_sc_single <- function(query, start_date, end_date, config_path, override_d
   
   if(query$queryType == "overtime") {
     data <- with(query, RSiteCatalyst::QueueOvertime(suite, start_date, end_date
-                                         , metrics_clean, date.granularity = date.granularity, segment.id = segment.id))
+                                                     , metrics_clean, date.granularity = date.granularity, segment.id = segment.id))
   } else if (query$queryType == "trended") {
     data <- with(query, RSiteCatalyst::QueueTrended(suite, start_date, end_date
-                                        , metrics_clean, elements_clean, search = search_clean, segment.id = segment.id
-                                        , date.granularity = date.granularity, top = top))
+                                                    , metrics_clean, elements_clean, search = search_clean, segment.id = segment.id
+                                                    , date.granularity = date.granularity, top = top))
   } else if (query$queryType == "ranked") {
     data <- with(query, RSiteCatalyst::QueueRanked(suite, start_date, end_date
-                                       , metrics_clean, elements_clean, search = search_clean
-                                       , segment.id = segment.id, top = top))
+                                                   , metrics_clean, elements_clean, search = search_clean
+                                                   , segment.id = segment.id, top = top))
   }
   
   if("datetime" %in% colnames(data)){
@@ -50,9 +50,9 @@ query_sc_single <- function(query, start_date, end_date, config_path, override_d
   data[, query := jsonlite::toJSON(query)]
   
   if(nrow(data) > 0) {
-   if("name" %in% colnames(data) & !invalid(elements_clean)) {
-    setnames(data, "name", elements_clean)
-   }
+    if("name" %in% colnames(data) & !invalid(elements_clean)) {
+      setnames(data, "name", elements_clean)
+    }
   }
   
   return(data)
@@ -89,8 +89,8 @@ query_sc <- function(queries_table, start_date, end_date, config_path = "config.
   
   for (i in 1:nrow(queries_table)) {
     results[[i]] <- query_sc_single_safe(as.list(queries_table[i,]),
-                                    start_date, end_date, config_path,
-                                    override_dates = override_dates)
+                                         start_date, end_date, config_path,
+                                         override_dates = override_dates)
     Sys.sleep(1)
   }
   results <- data.table::rbindlist(results, fill = TRUE)
