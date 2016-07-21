@@ -69,7 +69,7 @@ query_sc_single_safe <- dplyr::failwith(data.table(), query_sc_single)
 #' @param override_dates set to true in order to override the query date
 #' @param include_query_data set to true in order to include the query data to the output file
 #'
-#' @return RETURN data table with queried data
+#' @return data.table with queried data
 #' @export
 query_sc <- function(queries_table, start_date, end_date, config_path = "config.json",
                      override_dates = TRUE, include_query_data = FALSE) {
