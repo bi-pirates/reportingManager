@@ -89,8 +89,7 @@ active_queries <- function(path = ""){
   } else {
     files <- list.files(path, full.names = TRUE)
   }
-  
-  data <- unique(unlist(sapply(as.list(files[grepl(".Rmd|.R", files)]), active_queries)))
+  data <- unique(unlist(sapply(as.list(files[grepl("\\.Rmd$|\\.R$", files)]), active_queries)))
   return(data)
 }
 
