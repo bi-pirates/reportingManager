@@ -29,4 +29,3 @@ Get Adobe Analytics Data
 \examples{
 query_sc(queries_table, start_date, end_date, config_path = "config.json", override_dates = TRUE, include_query_data = FALSE)
 }
-

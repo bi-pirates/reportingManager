@@ -1,10 +1,6 @@
 #' @import data.table
 NULL
 
-# jsonlite
-# RMySQL
-# data.table
-
 #' Creates a queries folder as well as a template config.json doc
 #'
 #' \code{init_queries} Sets up directory for reading sql queries out of a queries directory
@@ -93,8 +89,7 @@ active_queries <- function(path = ""){
   } else {
     files <- list.files(path, full.names = TRUE)
   }
-  
-  data <- unique(unlist(sapply(as.list(files[grepl(".Rmd|.R", files)]), active_queries)))
+  data <- unique(unlist(sapply(as.list(files[grepl("\\.Rmd$|\\.R$", files)]), active_queries)))
   return(data)
 }
 
