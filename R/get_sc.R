@@ -45,11 +45,11 @@ query_sc_single <- function(query, start_date, end_date, config_path, override_d
   
   data <- data.table(data)
   
-  data[, query.name := query$queryName]
-  data[, reportSuite := query$suite]
-  data[, query := jsonlite::toJSON(query)]
-  
   if(nrow(data) > 0) {
+    data[, query.name := query$queryName]
+    data[, reportSuite := query$suite]
+    data[, query := jsonlite::toJSON(query)]
+    
     if("name" %in% colnames(data) & !invalid(elements_clean)) {
       setnames(data, "name", elements_clean)
     }
