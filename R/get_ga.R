@@ -1,29 +1,58 @@
 #' @import data.table
 NULL
 
-#' @import RGoogleAnalytics
+#' @import googleAuthR
+#' @import googleAnalyticsR
+
 NULL
 
-query_ga_single <- function(query, start_date, end_date, config_path, override_dates = TRUE){
-  config_data <- jsonlite::fromJSON(config_path)
-  ga_token <- with(config_data$google_analytics, RGoogleAnalytics::Auth(client_id, client_secret))
-  ValidateToken(ga_token)
-
+query_ga_single <- function(query, start_date, end_date, override_dates = TRUE){
+  ga_token <- googleAuthR:::gar_auth()
+  
   # Save query.name for diagnostic info
   query.name <- query$query.name
-  queryInfo <- buildQuery(query, start_date, end_date, override_dates)
-  query_builder <- RGoogleAnalytics::QueryBuilder(queryInfo$query)
-
-  message(sprintf("Query: %s validated\n", query.name))
-  query_response <- RGoogleAnalytics::GetReportData(query_builder, ga_token)
+  queryInfo <- buildQuery(query, start_date, end_date, TRUE)
+  query <- queryInfo$query
+  
+  query_response <- google_analytics(id = param_clean(query$table.id), start = query$start.date, 
+                      end = query$end.date, metrics = param_clean(query$metrics),
+                      dimensions = param_clean(query$dimensions), sort = query$sort, 
+                      filters = query$filters, segment = query$segment,
+                      samplingLevel = query$sampling,
+                      max_results = query$max.results, multi_account_batching = FALSE, type = query$source)
+  
   message("Data returned\n")
-  Sys.sleep(1.05) #patch for google analytics issue (remove / tweak)
   query_response <- data.table::data.table(query_response)
   query_response <- melt_ga(query_response, queryInfo)
   message("Data reshaped\n")
   return(query_response)
 }
 
+query_ga_range <- function(query){
+  ga_token <- googleAuthR:::gar_auth()
+  
+  query$date.range <- unlist(strsplit(query$date.range,","))
+  
+  # Save query.name for diagnostic info
+  query.name <- query$query.name
+  queryInfo <- buildQuery(query, override_dates = FALSE)
+  query <- queryInfo$query
+  
+  query_response <- google_analytics_4(viewId = param_clean(query$table.id), date_range = query$date.range, 
+                                       metrics = param_clean(query$metrics), dimensions = param_clean(query$dimensions),
+                                       dim_filters = NULL, met_filters = NULL,
+                                       filtersExpression = query$filters, order = order_type(param_clean(query$metrics[1]), "DESCENDING", "DELTA"), segments = query$segment,
+                                       pivots = NULL, cohorts = NULL, max = query$max.results,
+                                       samplingLevel = query$sampling, metricFormat = NULL,
+                                       histogramBuckets = NULL)
+
+  message("Data returned\n")
+  query_response <- data.table::data.table(query_response)
+  queryInfo$query$metrics <- c(paste0(queryInfo$query$metrics,".d1"), paste0(queryInfo$query$metrics,".d2"))
+  query_response <- melt_ga(query_response, queryInfo)
+  message("Data reshaped\n")
+  return(query_response)
+}
 
 fill_date_metrics <- function(dimension, implied_dimension, query_dimensions) {
   # one dimension implies
@@ -47,11 +76,15 @@ if(is.null(query["end.date"]) | override_dates) {
 }
 # Remove NA / Irrelevant Fields
 fields <- c("start.date", "end.date", "dimensions", "metrics"
-            , "table.id", "sort", "filters", "segment", "max.results")
+            , "table.id", "sort", "filters", "segment", "max.results", "sampling", "source", "date.range")
 labels <- query[!names(query) %in% fields]
 query <- query[fields]
+if(is.na(query$max.results)){
+  query$max.results <- 1000
+}else{
+  query$max.results <- as.numeric(query$max.results) 
+}
 query <- query[!is.na(query)]
-query$max.results <- as.numeric(query$max.results)
 # Cleanup Date Metrics
 date_dimensions <- data.table::data.table(dimension = c("month", "week", "day", "hour"), implied_dimension = c("year", "year", "date", "date"))
 
@@ -83,12 +116,16 @@ return(list(query = query, labels = labels))
 #' query_ga(queries_table, "2015-01-01", "2015-02-01", config_path = "config.json", override_dates = TRUE)
 #' }
 #' @export
-query_ga <- function(queries_table, start_date, end_date, config_path = "config.json", override_dates = TRUE, include_query_data = FALSE) {
+query_ga <- function(queries_table, start_date, end_date, override_dates = TRUE, include_query_data = FALSE) {
   results <- list()
 
   for (i in 1:nrow(queries_table)) {
-    results[[i]] <- query_ga_single(as.list(queries_table[i,])
-                                    , start_date, end_date, config_path, override_dates = override_dates)
+    if(is.na(queries_table[i,]$date.range)){
+      results[[i]] <- query_ga_single(as.list(queries_table[i,])
+                                      , start_date, end_date, override_dates = override_dates)  
+    }else{
+      results[[i]] <- query_ga_range(as.list(queries_table[i,]))
+    } 
   }
   results <- data.table::rbindlist(results, fill = TRUE)
   if(!include_query_data) {
