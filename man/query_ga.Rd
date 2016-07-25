@@ -4,8 +4,8 @@
 \alias{query_ga}
 \title{Fetch clean, streamlined Google Analytics Data, from a data.table of queries}
 \usage{
-query_ga(queries_table, start_date, end_date, config_path = "config.json",
-  override_dates = TRUE, include_query_data = FALSE)
+query_ga(queries_table, start_date, end_date, override_dates = TRUE,
+  include_query_data = FALSE)
 }
 \arguments{
 \item{queries_table}{data.table of queries}
@@ -14,11 +14,11 @@ query_ga(queries_table, start_date, end_date, config_path = "config.json",
 
 \item{end_date}{end date as character string in \code{"\%Y-\%m-\%d"} format}
 
-\item{config_path}{path where the config.json file is located}
-
 \item{override_dates}{whether all dates should be overriden with those in \code{start_date} & \code{end_date}}
 
 \item{include_query_data}{whether the full query data should be included in a column as a json object}
+
+\item{config_path}{path where the config.json file is located}
 }
 \value{
 A data.table filled with great, interesting googleAnalytics data!!
