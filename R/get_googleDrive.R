@@ -83,7 +83,9 @@ get_gdrive_queries <- function(config_path){
   config_data <- jsonlite::fromJSON(config_path)
   files <- get_query_folder_contents(config_data$google_drive)
   links <- sapply(files, get_download_link)
-  links <- links[sapply(links, function(x) length(x) > 0, USE.NAMES=TRUE)]
+  if(is.null(names(links))){
+    links <- unlist(links, recursive = F)  
+  }
   query_data <- lapply(links, function(x) get_sheet(x[[1]]))
   if(is.null(names(query_data))){
     names <- sapply(links, function(x) (names(x)))
