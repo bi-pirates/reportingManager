@@ -137,8 +137,8 @@ query_facebook_pages <- function(facebookPages, start_date, end_date, token_path
 
   for(i in 1:length(facebookPages)){
     pages[[i]] <- getPage(page = facebookPages[i], token = facebook_token, since = start_date, until = end_date, n = 1e4)
-    likes[[i]] <- as.data.table(SocialMediaMineR::get_facebook(paste0("https://www.facebook.com/",facebookPages[i])))
-    pages[[i]] <- cbind(pages[[i]], "likes_total" = likes[[i]]$like_count)
+    #likes[[i]] <- as.data.table(SocialMediaMineR::get_facebook(paste0("https://www.facebook.com/",facebookPages[i])))
+    #pages[[i]] <- cbind(pages[[i]], "likes_total" = likes[[i]]$like_count)
   }
   # save RDS for query_facebook_posts function
   saveRDS(pages, file = "pages_rawData.rds")
