@@ -149,7 +149,7 @@ query_facebook_pages <- function(facebookPages, start_date, end_date, token_path
   pages[, quarter := lubridate::quarter(date, with_year = TRUE) %>% as.character]
   pages[, year := lubridate::year(date) %>% as.character]
   pages[, totalEngagement := (likes_count + comments_count + shares_count), by = id]
-  pages[, averageER := sum(totalEngagement)/likes_total, by = .(from_name, month)]
+  # pages[, averageER := sum(totalEngagement)/likes_total, by = .(from_name, month)]
 
   return(pages)
 }
@@ -237,8 +237,8 @@ query_facebook_competitor_posts <- function(token_path = "tokens/fbInsights_toke
   for(x in 1:length(pages)){
     for(i in 1:nrow(pages[[x]])){
       posts[[i]] <- getPost(post = pages[[x]]$id[i], token = facebook_token, n = 5)
-      likes[[i]] <- pages[[x]]$likes_total[i]
-      posts[[i]] <- cbind(posts[[i]]$post, "likes_total" = likes[[i]])
+     # likes[[i]] <- pages[[x]]$likes_total[i]
+     # posts[[i]] <- cbind(posts[[i]]$post, "likes_total" = likes[[i]])
       print(paste0(i," von ", nrow(pages[[x]])))
     }
     if(length(postData) == 0){
@@ -255,8 +255,8 @@ query_facebook_competitor_posts <- function(token_path = "tokens/fbInsights_toke
   postData[, quarter := lubridate::quarter(date, with_year = TRUE) %>% as.character]
   postData[, year := lubridate::year(date) %>% as.character]
   postData[, totalEngagement := (likes_count + comments_count + shares_count), by = id]
-  postData[, ER := totalEngagement/likes_total, by = id]
-  postData[ER == "Inf", ER := 0]
+  #postData[, ER := totalEngagement/likes_total, by = id]
+  #postData[ER == "Inf", ER := 0]
 
   return(postData)
 }
