@@ -37,8 +37,8 @@ auth_fbInsights <- function(config_path = "config.json", token_path = "tokens/fb
     save(facebook_token, file = token_path)
   }
   load(token_path)
-  req <- httr::GET("https://graph.facebook.com/v2.3/me", httr::config(token = facebook_token))
-  httr::stop_for_status(req)
+  #req <- httr::GET("https://graph.facebook.com/v2.3/me", httr::config(token = facebook_token))
+  #httr::stop_for_status(req)
 }
 
 query_facebook_single <- function(query, start_date, end_date
