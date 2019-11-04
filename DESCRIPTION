@@ -20,7 +20,6 @@ Imports:
     lubridate,
     dplyr,
     RSiteCatalyst, 
-    SocialMediaMineR,
     magrittr,
     Rfacebook,
     rmarkdown
