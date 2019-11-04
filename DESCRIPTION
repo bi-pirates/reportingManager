@@ -8,6 +8,7 @@ Description: Merges Google Analytics, SiteCatalyst, etc. data into a consistent
     format
 License: MIT
 LazyData: TRUE
+StagedInstall: no
 Imports:
     devtools,
     httr,
